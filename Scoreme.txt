@@ -1,0 +1,45 @@
+def longest_path(graph: list) -> int:
+    n = len(graph)
+    
+    # Step 1: Topological Sort
+    topo_order = topological_sort(graph)
+    
+    # Step 2: Calculate the longest path using the topological order
+    return calculate_longest_path(graph, topo_order)
+
+# Helper function to perform topological sort
+def topological_sort(graph):
+    n = len(graph)
+    in_degree = [0] * n
+    for u in range(n):
+        for v, _ in graph[u]:
+            in_degree[v] += 1
+    
+    zero_in_degree_queue = [u for u in range(n) if in_degree[u] == 0]
+    topo_order = []
+    
+    while zero_in_degree_queue:
+        u = zero_in_degree_queue.pop(0)
+        topo_order.append(u)
+        for v, _ in graph[u]:
+            in_degree[v] -= 1
+            if in_degree[v] == 0:
+                zero_in_degree_queue.append(v)
+    
+    return topo_order
+
+# Function to calculate longest path using topological sort
+def calculate_longest_path(graph, topo_order):
+    n = len(graph)
+    dist = [-float('inf')] * n
+    
+    # Initialize the distances to 0 for all nodes that have no incoming edges
+    for u in topo_order:
+        if dist[u] == -float('inf'):
+            dist[u] = 0
+        for v, weight in graph[u]:
+            if dist[v] < dist[u] + weight:
+                dist[v] = dist[u] + weight
+    
+    # The longest path in the graph will be the maximum value in the dist array
+    return max(dist)
